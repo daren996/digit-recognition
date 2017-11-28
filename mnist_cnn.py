@@ -21,9 +21,6 @@ def conv2d(x, W):
     # strides=[1,x_movement,y_movement,1]
     return tf.nn.conv2d(x, W, strides=[1,1,1,1], padding='SAME')
 
-def max_pool_2x2(x):
-    return tf.nn.max_pool(x, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
-
 if __name__ == '__main__':
     # load mnist data
     mnist = input_data.read_data_sets("./Mnist_data/", one_hot=True)
@@ -35,25 +32,22 @@ if __name__ == '__main__':
     x_image = tf.reshape(X, [-1, 28, 28, 1])
 
     # ********************** conv1 *********************************
-    # transfer a 5*5*1 imagine into 32 sequence
     W_conv1 = weight_variable([5, 5, 1, 32])
     b_conv1 = bias_variable([32])
-    # input a imagine and make a 5*5*1 to 32 with stride=1*1, and activate with relu
     h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)  # output size 28*28*32
-    h_pool1 = max_pool_2x2(h_conv1)  # output size 14*14*32
+    h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    # output size 14*14*32
 
     # ********************** conv2 *********************************
-    # transfer a 5*5*32 imagine into 64 sequence
     W_conv2 = weight_variable([5, 5, 32, 64])
     b_conv2 = bias_variable([64])
-    # input a imagine and make a 5*5*32 to 64 with stride=1*1, and activate with relu
     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)  # output size 14*14*64
-    h_pool2 = max_pool_2x2(h_conv2)  # output size 7*7*64
+    h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    # output size 7*7*64
 
     # ********************* func1 layer *********************************
     W_fc1 = weight_variable([7 * 7 * 64, 1024])
     b_fc1 = bias_variable([1024])
-    # reshape the image from 7,7,64 into a flat (7*7*64)
     h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
@@ -65,7 +59,6 @@ if __name__ == '__main__':
 
     # calculate the loss
     cross_entropy = tf.reduce_mean(-tf.reduce_sum(Y * tf.log(prediction), reduction_indices=[1]))
-    # use Gradientdescentoptimizer
     train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 
     # init saver

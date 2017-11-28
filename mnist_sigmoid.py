@@ -2,14 +2,6 @@ from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 import numpy as np
 
-# 初始化权重w
-def init(shape):
-    return tf.Variable(tf.random_normal(shape, stddev=0.01))
-
-# 定义模型
-def model(X, w):
-    return tf.matmul(X, w)
-
 if __name__ == '__main__':
     # 获取mnist 数据
     mnist = input_data.read_data_sets("./Mnist_data/", one_hot=True)
@@ -19,8 +11,8 @@ if __name__ == '__main__':
     X = tf.placeholder("float", [None, 784])
     Y = tf.placeholder("float", [None, 10])
 
-    w = init([784, 10])
-    py_x = model(X, w)
+    w = tf.Variable(tf.random_normal([784, 10], stddev=0.01))
+    py_x = tf.matmul(X, w)
 
     # 定义损失函数，交叉熵损失函数 y=sigmoid(X∗W)
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=py_x, labels=Y))
@@ -37,8 +29,7 @@ if __name__ == '__main__':
 
     # 定义会话
     sess = tf.Session()
-    init = tf.initialize_all_variables()
-    sess.run(init)
+    sess.run(tf.initialize_all_variables())
 
     # 调用多次梯度下降
     for i in range(100):

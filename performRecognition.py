@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # args = vars(parser.parse_args())
     args = {}
     args["classiferPath"] = './digits_cls.pkl'
-    args["image"] = './photo_cdr1.jpg'
+    args["image"] = './photo_3.jpg'
 
     # Read the input image
     im = cv2.imread(args["image"])
@@ -87,8 +87,8 @@ if __name__ == '__main__':
     # thresh:阈值，maxval:在二元阈值THRESH_BINARY和逆二元阈值THRESH_BINARY_INV中使用的最大值
     # 返回值retval其实就是阈值 type:使用的阈值类型
     # ret, im_th = cv2.threshold(im_gray, 90, 255, cv2.THRESH_BINARY_INV) # photo_1 and photo_2
-    ret, im_th = cv2.threshold(im_gray, 124, 255, cv2.THRESH_BINARY_INV) # photo_cdr1
-    # ret, im_th = cv2.threshold(im_gray, 110, 255, cv2.THRESH_BINARY_INV) # photo_3
+    # ret, im_th = cv2.threshold(im_gray, 124, 255, cv2.THRESH_BINARY_INV) # photo_cdr1
+    ret, im_th = cv2.threshold(im_gray, 110, 255, cv2.THRESH_BINARY_INV) # photo_3 and photo_4
 
     # Find contours in the image
     # 第二个参数表示轮廓的检索模式
@@ -116,7 +116,11 @@ if __name__ == '__main__':
         pt2 = int(rect[0] + rect[2] // 2 - leng // 2)
         roi = im_th[pt1:pt1 + leng, pt2:pt2 + leng]
         # Resize the image
-        roi = cv2.resize(roi, (28, 28), interpolation=cv2.INTER_AREA)
+        try:
+            roi = cv2.resize(roi, (28, 28), interpolation=cv2.INTER_AREA)
+        except:
+            print("Wrong contour!")
+            continue
         roi = cv2.dilate(roi, (3, 3))
         roi = roi.flatten()
         roi = roi / 255
@@ -125,7 +129,7 @@ if __name__ == '__main__':
         nbr = getResult_cnn(roi, cnn_parameters[0], cnn_parameters[1], cnn_parameters[2], cnn_parameters[3])
         # nbr = getResult_sigmoid(roi, sigmoid_parameters[0], sigmoid_parameters[1], sigmoid_parameters[2])
         print(nbr, end=' ')
-        cv2.putText(im, str(int(nbr[0])), (rect[0], rect[1]), cv2.FONT_HERSHEY_DUPLEX, 2, (0, 255, 255), 1)
+        cv2.putText(im, str(int(nbr[0])), (rect[0], rect[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
 
     cv2.namedWindow("Resulting Image with Rectangular ROIs", cv2.WINDOW_NORMAL)
     cv2.imshow("Resulting Image with Rectangular ROIs", im)
