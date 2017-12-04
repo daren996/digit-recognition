@@ -1,5 +1,6 @@
 import cv2
 import tensorflow as tf
+import sys
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev=0.1)
@@ -73,7 +74,7 @@ if __name__ == '__main__':
     # args = vars(parser.parse_args())
     args = {}
     args["classiferPath"] = './digits_cls.pkl'
-    args["image"] = './photo_3.jpg'
+    args["image"] = './photo_cdr2.jpg'
 
     # Read the input image
     im = cv2.imread(args["image"])
@@ -87,8 +88,8 @@ if __name__ == '__main__':
     # thresh:阈值，maxval:在二元阈值THRESH_BINARY和逆二元阈值THRESH_BINARY_INV中使用的最大值
     # 返回值retval其实就是阈值 type:使用的阈值类型
     # ret, im_th = cv2.threshold(im_gray, 90, 255, cv2.THRESH_BINARY_INV) # photo_1 and photo_2
-    # ret, im_th = cv2.threshold(im_gray, 124, 255, cv2.THRESH_BINARY_INV) # photo_cdr1
-    ret, im_th = cv2.threshold(im_gray, 110, 255, cv2.THRESH_BINARY_INV) # photo_3 and photo_4
+    ret, im_th = cv2.threshold(im_gray, 124, 255, cv2.THRESH_BINARY_INV) # photo_cdr1 and photo_cdr2
+    # ret, im_th = cv2.threshold(im_gray, 110, 255, cv2.THRESH_BINARY_INV) # photo_3 and photo_4
 
     # Find contours in the image
     # 第二个参数表示轮廓的检索模式
@@ -109,7 +110,7 @@ if __name__ == '__main__':
     # For each rectangular region, calculate HOG features and predict
     for rect in rects:
         # Draw the rectangles | cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0), 3)
-        cv2.rectangle(im, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (0, 255, 0), 3)
+        cv2.rectangle(im, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (0, 133, 133), 1)
         # Make the rectangular region around the digit
         leng = int(rect[3] * 1.6)
         pt1 = int(rect[1] + rect[3] // 2 - leng // 2)
@@ -129,7 +130,7 @@ if __name__ == '__main__':
         nbr = getResult_cnn(roi, cnn_parameters[0], cnn_parameters[1], cnn_parameters[2], cnn_parameters[3])
         # nbr = getResult_sigmoid(roi, sigmoid_parameters[0], sigmoid_parameters[1], sigmoid_parameters[2])
         print(nbr, end=' ')
-        cv2.putText(im, str(int(nbr[0])), (rect[0], rect[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+        cv2.putText(im, str(int(nbr[0])), (rect[0], rect[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (199, 0, 0), 1)
 
     cv2.namedWindow("Resulting Image with Rectangular ROIs", cv2.WINDOW_NORMAL)
     cv2.imshow("Resulting Image with Rectangular ROIs", im)
